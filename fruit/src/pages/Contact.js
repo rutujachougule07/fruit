@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Mail, Phone, MapPin, Send, MessageSquare, Apple, Clock, User, MessageCircle, Info } from 'lucide-react';
 import './Contact.css';
 import { firestoreDb } from './firebase';

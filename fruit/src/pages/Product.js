@@ -12,7 +12,7 @@ import { auth } from './firebase';
 
 const Product = () => {
     const { id: paramId } = useParams();
-    const { products, setProducts } = useProducts();
+    const { products } = useProducts();
     const location = useLocation();
     const navigate = useNavigate();
     const searchQuery = location.state?.searchQuery || '';

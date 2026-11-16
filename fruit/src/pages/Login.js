@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { LogIn, User, Lock, ArrowRight, UserPlus, Sparkles, Phone, Mail } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { User, Lock, ArrowRight, UserPlus, Sparkles, Mail } from 'lucide-react';
 import './Login.css';
 import { auth } from './firebase';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, updateProfile } from 'firebase/auth';

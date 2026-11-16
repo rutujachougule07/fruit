@@ -394,13 +394,15 @@ const Checkout = () => {
                                 <button
                                     type="button"
                                     onClick={handleGetGPSLocation}
+                                    disabled={isLocating}
                                     style={{
                                         background: '#16a34a', color: '#fff', border: 'none', padding: '6px 14px',
-                                        borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold', cursor: 'pointer',
-                                        display: 'flex', alignItems: 'center', gap: '6px'
+                                        borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold', cursor: isLocating ? 'not-allowed' : 'pointer',
+                                        display: 'flex', alignItems: 'center', gap: '6px',
+                                        opacity: isLocating ? 0.7 : 1
                                     }}
                                 >
-                                    <MapPin size={14} /> Detect My GPS Location
+                                    <MapPin size={14} /> {isLocating ? 'Detecting...' : 'Detect My GPS Location'}
                                 </button>
                             </div>
 

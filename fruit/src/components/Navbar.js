@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { ShoppingCart, Search, Menu, X, ChevronDown, Trash2, Heart, User, LogOut } from 'lucide-react';
+import { ShoppingCart, Search, Menu, X, Trash2, Heart, User } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import './Navbar.css';
 import { auth, firestoreDb } from '../pages/firebase';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { onAuthStateChanged } from 'firebase/auth';
 import { doc, onSnapshot } from 'firebase/firestore';
 
 const Navbar = () => {
@@ -17,7 +17,6 @@ const Navbar = () => {
     const [isCategoryOpen, setIsCategoryOpen] = useState(location.pathname === '/');
     const [isCartOpen, setIsCartOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
-    const [currentUser, setCurrentUser] = useState(null);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [navContent, setNavContent] = useState({
         logo_title: 'EarthVibes',
@@ -36,10 +35,8 @@ const Navbar = () => {
             const isDemo = localStorage.getItem('demo_user') === 'true';
             if (user || isDemo) {
                 setIsLoggedIn(true);
-                setCurrentUser(user || { displayName: 'Rutuja' });
             } else {
                 setIsLoggedIn(false);
-                setCurrentUser(null);
             }
         });
 
@@ -66,18 +63,6 @@ const Navbar = () => {
         setIsMobileMenuOpen(false);
         setIsCartOpen(false);
     }, [location.pathname]);
-
-    const handleLogout = async () => {
-        try {
-            await signOut(auth);
-            localStorage.removeItem('demo_user');
-            setIsLoggedIn(false);
-            setCurrentUser(null);
-            navigate('/');
-        } catch (error) {
-            console.error("Logout error:", error);
-        }
-    };
 
     const toggleMobileMenu = () => {
         setIsMobileMenuOpen(!isMobileMenuOpen);

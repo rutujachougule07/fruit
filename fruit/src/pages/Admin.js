@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutDashboard, MessageSquare, ShoppingBag, LogOut, Shield, Plus, Edit, Trash2, Activity, Printer, X, ShoppingCart, CheckCircle, Eye, Apple, FileText, Edit2, Truck, Menu, MapPin, UserCheck, Tag, Settings, Navigation } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, ShoppingBag, LogOut, Shield, Plus, Edit, Trash2, Activity, Printer, X, CheckCircle, Eye, Apple, FileText, Edit2, Truck, Menu, MapPin } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useProducts } from '../context/ProductContext';
 import { useStore } from '../context/StoreContext';
@@ -7,6 +7,61 @@ import { firestoreDb, auth } from './firebase';
 import { signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'firebase/auth';
 import { collection, onSnapshot, doc, setDoc, updateDoc, deleteDoc, query, orderBy, where, getDocs, increment } from 'firebase/firestore';
 import './Admin.css';
+
+const DEFAULT_HOME_BANNERS = [
+    { id: 1, badge: "100% Organic", title: "Fresh Fruits,\n Delivered Direct to You.", desc: "Experience the finest selection of exotic and seasonal fruits, handpicked for quality and freshness. Taste the difference today.", image: 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?auto=format&fit=crop&w=1200&q=80', btn1_text: 'Shop Now', btn1_link: '/product', btn2_text: 'Contact Us', btn2_link: '/contact' },
+    { id: 2, badge: "Fresh Arrival", title: "Farm Fresh Berries\n Now In Stock", desc: "Sweet and juicy strawberries, blueberries, and raspberries. Perfect for your morning smoothies or healthy snacking.", image: "https://images.unsplash.com/photo-1464965911861-746a04b4cda0?auto=format&fit=crop&w=1200&q=80", btn1_text: 'Shop Now', btn1_link: '/product', btn2_text: 'Contact Us', btn2_link: '/contact' },
+    { id: 3, badge: "Bestseller", title: "Premium Mangoes\n Straight from Orchards", desc: "Taste the King of Fruits. We deliver the best grade Alphonso and Kesar mangoes globally.", image: "https://images.unsplash.com/photo-1553279768-865429fa0078?q=80&w=1974&auto=format&fit=crop", btn1_text: 'Shop Now', btn1_link: '/product', btn2_text: 'Contact Us', btn2_link: '/contact' },
+    { id: 4, badge: "Healthy Choice", title: "Fresh Apples\n & Pears", desc: "Crunchy, sweet, and packed with nutrients. Get the best quality apples and natural fruits delivered fresh.", image: "https://images.unsplash.com/photo-1560806887-1e4cd0b6bcd6?q=80&w=1974&auto=format&fit=crop", btn1_text: 'Shop Now', btn1_link: '/product', btn2_text: 'Contact Us', btn2_link: '/contact' }
+];
+
+const DEFAULT_HOME_CONTENT = {
+    features: [
+        { icon: 'Truck', title: 'Global Export', desc: 'Delivering fresh fruits worldwide' },
+        { icon: 'ShieldCheck', title: 'Premium Quality', desc: '100% Organic & Handpicked' },
+        { icon: 'Clock', title: 'Ultra Fast', desc: 'Freshness preserved in transit' }
+    ],
+    featured_section: {
+        title: 'Featured Freshness',
+        subtitle: 'Our Selection'
+    },
+    about_section: {
+        title: 'From Local Orchards to Global Markets',
+        subtitle: 'Why Choose Us',
+        desc: 'With over two decades of experience, EarthVibes Exports has been a pioneer in bridging the gap between quality-conscious farmers and global consumers. We believe in preserving the natural sweetness and nutritional value of every fruit.',
+        highlights: [
+            { num: '25+', label: 'Countries Exported' },
+            { num: '500+', label: 'Trusted Farmers' },
+            { num: '100%', label: 'Satisfaction Rate' }
+        ],
+        image: '',
+        exp_years: '20+ Years',
+        exp_label: 'of Excellence'
+    },
+    navbar: {
+        logo_title: 'EarthVibes',
+        logo_subtitle: 'EXPORTS',
+        logo_icon: '🧺',
+        logo_img: '',
+        links: [
+            { label: 'Home', path: '/' },
+            { label: 'About', path: '/about' },
+            { label: 'Product', path: '/product' },
+            { label: 'Contact', path: '/contact' }
+        ]
+    },
+    footer: {
+        desc: 'We provide premium quality, handpicked fresh fruits delivered directly to your doorstep. Experience the taste of nature in its purest form.',
+        address: '123 Fruit Market, Pune, MH, India',
+        phone: '+91 98765 43210',
+        email: 'support@earthvibesexports.com',
+        social_fb: '#',
+        social_ig: '#',
+        social_tw: '#',
+        newsletter_title: 'Newsletter',
+        newsletter_desc: 'Subscribe to get updates on new arrivals.'
+    }
+};
 
 const Admin = () => {
     const { products: fruits, addProduct, updateProduct, deleteProduct } = useProducts();
@@ -61,60 +116,8 @@ const Admin = () => {
     const [orderSearchQuery, setOrderSearchQuery] = useState('');
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-    const [homeBanners, setHomeBanners] = useState([
-        { id: 1, badge: "100% Organic", title: "Fresh Fruits,\n Delivered Direct to You.", desc: "Experience the finest selection of exotic and seasonal fruits, handpicked for quality and freshness. Taste the difference today.", image: 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?auto=format&fit=crop&w=1200&q=80', btn1_text: 'Shop Now', btn1_link: '/product', btn2_text: 'Contact Us', btn2_link: '/contact' },
-        { id: 2, badge: "Fresh Arrival", title: "Farm Fresh Berries\n Now In Stock", desc: "Sweet and juicy strawberries, blueberries, and raspberries. Perfect for your morning smoothies or healthy snacking.", image: "https://images.unsplash.com/photo-1464965911861-746a04b4cda0?auto=format&fit=crop&w=1200&q=80", btn1_text: 'Shop Now', btn1_link: '/product', btn2_text: 'Contact Us', btn2_link: '/contact' },
-        { id: 3, badge: "Bestseller", title: "Premium Mangoes\n Straight from Orchards", desc: "Taste the King of Fruits. We deliver the best grade Alphonso and Kesar mangoes globally.", image: "https://images.unsplash.com/photo-1553279768-865429fa0078?q=80&w=1974&auto=format&fit=crop", btn1_text: 'Shop Now', btn1_link: '/product', btn2_text: 'Contact Us', btn2_link: '/contact' },
-        { id: 4, badge: "Healthy Choice", title: "Fresh Apples\n & Pears", desc: "Crunchy, sweet, and packed with nutrients. Get the best quality apples and natural fruits delivered fresh.", image: "https://images.unsplash.com/photo-1560806887-1e4cd0b6bcd6?q=80&w=1974&auto=format&fit=crop", btn1_text: 'Shop Now', btn1_link: '/product', btn2_text: 'Contact Us', btn2_link: '/contact' }
-    ]);
-
-    const [homeContent, setHomeContent] = useState({
-        features: [
-            { icon: 'Truck', title: 'Global Export', desc: 'Delivering fresh fruits worldwide' },
-            { icon: 'ShieldCheck', title: 'Premium Quality', desc: '100% Organic & Handpicked' },
-            { icon: 'Clock', title: 'Ultra Fast', desc: 'Freshness preserved in transit' }
-        ],
-        featured_section: {
-            title: 'Featured Freshness',
-            subtitle: 'Our Selection'
-        },
-        about_section: {
-            title: 'From Local Orchards to Global Markets',
-            subtitle: 'Why Choose Us',
-            desc: 'With over two decades of experience, EarthVibes Exports has been a pioneer in bridging the gap between quality-conscious farmers and global consumers. We believe in preserving the natural sweetness and nutritional value of every fruit.',
-            highlights: [
-                { num: '25+', label: 'Countries Exported' },
-                { num: '500+', label: 'Trusted Farmers' },
-                { num: '100%', label: 'Satisfaction Rate' }
-            ],
-            image: '',
-            exp_years: '20+ Years',
-            exp_label: 'of Excellence'
-        },
-        navbar: {
-            logo_title: 'EarthVibes',
-            logo_subtitle: 'EXPORTS',
-            logo_icon: '🧺',
-            logo_img: '',
-            links: [
-                { label: 'Home', path: '/' },
-                { label: 'About', path: '/about' },
-                { label: 'Product', path: '/product' },
-                { label: 'Contact', path: '/contact' }
-            ]
-        },
-        footer: {
-            desc: 'We provide premium quality, handpicked fresh fruits delivered directly to your doorstep. Experience the taste of nature in its purest form.',
-            address: '123 Fruit Market, Pune, MH, India',
-            phone: '+91 98765 43210',
-            email: 'support@earthvibesexports.com',
-            social_fb: '#',
-            social_ig: '#',
-            social_tw: '#',
-            newsletter_title: 'Newsletter',
-            newsletter_desc: 'Subscribe to get updates on new arrivals.'
-        }
-    });
+    const [homeBanners, setHomeBanners] = useState(DEFAULT_HOME_BANNERS);
+    const [homeContent, setHomeContent] = useState(DEFAULT_HOME_CONTENT);
 
     const navigate = useNavigate();
 
@@ -126,7 +129,7 @@ const Admin = () => {
                 setHomeBanners(bannerList.sort((a, b) => a.id - b.id));
             } else {
                 // Seed initial banners if empty
-                homeBanners.forEach(async (b) => {
+                DEFAULT_HOME_BANNERS.forEach(async (b) => {
                     await setDoc(doc(firestoreDb, 'banners', b.id.toString()), b);
                 });
             }
@@ -138,7 +141,7 @@ const Admin = () => {
                 setHomeContent(snapshot.data());
             } else {
                 // Seed initial content if empty
-                setDoc(doc(firestoreDb, 'settings', 'home'), homeContent);
+                setDoc(doc(firestoreDb, 'settings', 'home'), DEFAULT_HOME_CONTENT);
             }
         });
 
